@@ -36,4 +36,48 @@ const profileSection=page.slice(page.indexOf('<dialog id="profileDialog">'),page
 assert(profileSection.includes('id="fontSize"'));assert(!page.slice(page.indexOf('<dialog id="settingsDialog">')).includes('id="fontSize"'));
 for(const file of ['style.css','themes.css','timetable.css','auth.css']){const css=fs.readFileSync(path.join(root,file),'utf8');assert(!/font-size:\s*\d+(?:\.\d+)?px/.test(css),file+' must use relative font sizes');assert(!/\bfont:[^;{}]*\dpx/.test(css),file+' must scale shorthand fonts too');}
 console.log('PASS: proportional font scale, safe default, and relative typography across all stylesheets.');
+run(`state.goals=[{id:'goal-1',name:'Health <goal>',icon:'◎',board:'1'},{id:'goal-2',name:'Family goal',board:'2'},{id:'goal-3',name:'Empty goal',board:'1'}];state.boards.push({id:'2',name:'Family & home',role:'viewer'});state.tasks[0].goal='goal-1';state.tasks[0].status='done';state.tasks.push({...state.tasks[0],id:'4',goal:'',title:'Unrelated task'});state.schedule[0].goal='goal-1';state.schedule.push({...state.schedule[0],id:'6',board:'2',title:'Family dinner',goal:'goal-2',trackHabit:false});`);
+const goalList=run('renderGoalList()');
+assert.equal((goalList.match(/class="goal-accordion"/g)||[]).length,3);
+assert.equal((goalList.match(/data-goal-accordion="[^"]+" open/g)||[]).length,3);
+assert.equal((goalList.match(/<summary>/g)||[]).length,3);
+assert(!/<details[^>]*\bname=/.test(goalList),'Accordions must not use an exclusive name group');
+assert.equal((goalList.match(/class="goal-children"/g)||[]).length,3);
+assert(!goalList.includes('<table'));assert(!goalList.includes('<thead'));
+assert.equal((goalList.match(/class="goal-linked-list"/g)||[]).length,2);
+assert.equal((goalList.match(/class="goal-linked-item"/g)||[]).length,3);
+assert(goalList.includes('goal-item-pills'));assert(goalList.includes('goal-time-pill'));assert(goalList.includes('goal-priority-High'));
+assert(goalList.includes('Health &lt;goal&gt;'));assert(goalList.includes('Morning &lt;walk&gt;'));assert(goalList.includes('Family &amp; home'));assert(goalList.includes('Family dinner'));
+assert(goalList.includes('data-id="3"'));assert(goalList.includes('data-schedule="5"'));assert(goalList.includes('data-schedule="6"'));assert(!goalList.includes('Unrelated task'));
+assert(goalList.includes('1 tasks · 1 routines'));assert(goalList.includes('Mon, Wed, Fri'));assert(goalList.includes('07:00–07:30'));assert(goalList.includes('>Done</span>'));assert(goalList.includes('No linked tasks or routines yet.'));
+const secondGoal=goalList.slice(goalList.indexOf('Family goal'),goalList.indexOf('Empty goal'));assert(secondGoal.includes('Family dinner'));assert(!secondGoal.includes('Morning &lt;walk&gt;'));
+console.log('PASS: grouped goal list includes completed tasks and recurring habits/routines, correct goal associations, schedule details, click targets, escaped text, and empty goals.');
+const originalQueryAll=document.querySelectorAll;
+document.querySelectorAll=selector=>selector==='.goal-accordion'?[{open:false,dataset:{goalAccordion:'goal-1'}},{open:true,dataset:{goalAccordion:'goal-2'}}]:[];
+const collapsedList=run('renderGoalList()');
+assert(!collapsedList.includes('data-goal-accordion="goal-1" open'));
+assert(collapsedList.includes('data-goal-accordion="goal-2" open'));
+assert(collapsedList.includes('data-goal-accordion="goal-3" open'));
+document.querySelectorAll=originalQueryAll;
+assert(!run('renderGoalList()').includes('data-goal-accordion="goal-1" open'),'Polling must preserve a deliberate collapse');
+run('closedGoalAccordions.clear()');assert.equal((run('renderGoalList()').match(/data-goal-accordion="[^"]+" open/g)||[]).length,3);
+console.log('PASS: goals are nested accordions, all open by default, multiple can stay open, and individual collapse state survives rerendering.');
+const eventLayout=JSON.parse(run(`JSON.stringify(layoutTimedEntries([{id:'a',startTime:'09:00',endTime:'11:00'},{id:'b',startTime:'09:30',endTime:'10:00'},{id:'c',startTime:'10:00',endTime:'11:00'},{id:'d',startTime:'11:00',endTime:'12:00'}]))`));
+assert.equal(eventLayout[0].top,9/24*100);assert.equal(eventLayout[0].height,2/24*100);assert.equal(eventLayout[0].width,50);assert.equal(eventLayout[1].lane,1);assert.equal(eventLayout[2].lane,1);assert.equal(eventLayout[3].width,100);
+assert.equal(eventLayout[1].height,eventLayout[0].height/4);
+const midnight=JSON.parse(run(`JSON.stringify(layoutTimedEntries([{id:'night',startTime:'00:00',endTime:'00:30'},{id:'late',startTime:'23:00',endTime:'23:59'}]))`));assert.equal(midnight[0].top,0);assert(midnight[1].top+midnight[1].height<=100);
+el('alternate').querySelector=()=>null;run("board='1';scheduleAnchor=dateFrom('2026-11-09');renderTimetable()");
+const timeCalendar=el('alternate').innerHTML;assert(timeCalendar.includes('time-calendar-grid'));assert.equal((timeCalendar.match(/class="time-day /g)||[]).length,7);assert(timeCalendar.includes('23:00'));assert(timeCalendar.includes('00:00'));assert(timeCalendar.includes('Morning &lt;walk&gt;'));assert(timeCalendar.includes('data-id="3"'));assert(timeCalendar.includes('data-schedule="5"'));assert(!timeCalendar.includes('Family dinner'));
+console.log('PASS: weekly time grid, accurate start/duration geometry, overlap lanes, touching-event reuse, midnight boundaries, and due-dated all-day tasks.');
+assert.equal(run('schedulePeriod'),'week');assert(timeCalendar.includes('data-timetable-view="week" class="active" aria-pressed="true"'));
+run("schedulePeriod='day';scheduleAnchor=dateFrom('2026-11-09');renderTimetable()");
+const dayCalendar=el('alternate').innerHTML;assert.equal((dayCalendar.match(/class="time-day /g)||[]).length,1);assert(dayCalendar.includes('data-period="day"'));assert(dayCalendar.includes('Morning &lt;walk&gt;'));
+assert.equal(run("localDay(shiftTimetableAnchor(dateFrom('2026-11-30'),1))"),'2026-12-01');
+run("schedulePeriod='month';scheduleAnchor=dateFrom('2026-11-15');renderTimetable()");
+const monthCalendar=el('alternate').innerHTML;assert(monthCalendar.includes('timetable-month'));assert(monthCalendar.includes('November 2026'));assert(monthCalendar.includes('data-id="3"'));assert(monthCalendar.includes('07:00–07:30'));assert.equal((monthCalendar.match(/class="timetable-month-day /g)||[]).length,42);
+assert.equal(run("localDay(shiftTimetableAnchor(dateFrom('2026-12-31'),1))"),'2027-01-01');
+run("scheduleAnchor=dateFrom('2028-02-10');renderTimetable()");assert(el('alternate').innerHTML.includes('aria-label="2028-02-29"'));
+run("schedulePeriod='week'");assert.equal(run("localDay(shiftTimetableAnchor(dateFrom('2026-11-09'),1))"),'2026-11-16');
+console.log('PASS: Week default/selected button, Day time grid, Month calendar/tasks/times, leap-day rendering, and period-specific navigation.');
+
 
