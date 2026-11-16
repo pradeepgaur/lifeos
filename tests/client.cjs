@@ -21,7 +21,7 @@ for(const theme of ['facebook','slate','forest','trello','notion','asana','monda
 const page=fs.readFileSync(path.join(root,'index.html'),'utf8'),stack=[];let ids=new Set();
 for(const match of page.matchAll(/<(\/?)([a-z][\w-]*)\b([^>]*)>/gi)){const [,closing,tag,attrs]=match;if(closing){assert.equal(stack.pop()?.tag,tag,'HTML nesting: '+tag);continue}const id=attrs.match(/\bid="([^"]+)"/);if(id){assert(!ids.has(id[1]),'Duplicate ID: '+id[1]);ids.add(id[1])}if(/id="(board|alternate)"/.test(attrs))assert.equal(stack.at(-1)?.attrs,' class="board-section"');if(!['meta','link','input','br','hr','img'].includes(tag))stack.push({tag,attrs})}assert.equal(stack.length,0);
 for(const file of ['render.js','timetable.js'])for(const match of fs.readFileSync(path.join(root,file),'utf8').matchAll(/id="([^"${}]+)"/g))ids.add(match[1]);
-for(const file of ['app.js','actions.js','timetable.js'])for(const match of fs.readFileSync(path.join(root,file),'utf8').matchAll(/\$\('([^']+)'\)/g))assert(ids.has(match[1]),'Missing DOM ID: '+match[1]);
+for(const file of ['app.js','actions.js','timetable.js','responsive.js'])for(const match of fs.readFileSync(path.join(root,file),'utf8').matchAll(/\$\('([^']+)'\)/g))assert(ids.has(match[1]),'Missing DOM ID: '+match[1]);
 console.log('PASS: weekly recurrence/date boundaries, monthly habit dates/checks, calendar routines/tasks, escaped names, non-actionable list groups, ages, all themes, HTML nesting, and UI bindings.');
 run("view='habits';layout='calendar';board='1';rememberNavigation();view='board';layout='board';board='';restoreNavigation('1')");
 assert.equal(run('view'),'habits');assert.equal(run('layout'),'calendar');assert.equal(run('board'),'1');
@@ -34,7 +34,7 @@ console.log('PASS: navigation restores sidebar page, layout, and board; account-
 run('applyFontSize(125)');assert.equal(fontProperties['--font-scale'],'1.25');assert.equal(fontProperties['font-size'],'20px');assert.equal(el('fontSize').value,'125');run('applyFontSize(999)');assert.equal(fontProperties['--font-scale'],'1.12');
 const profileSection=page.slice(page.indexOf('<dialog id="profileDialog">'),page.indexOf('<dialog id="goalDialog">'));
 assert(profileSection.includes('id="fontSize"'));assert(!page.slice(page.indexOf('<dialog id="settingsDialog">')).includes('id="fontSize"'));
-for(const file of ['style.css','themes.css','timetable.css','auth.css']){const css=fs.readFileSync(path.join(root,file),'utf8');assert(!/font-size:\s*\d+(?:\.\d+)?px/.test(css),file+' must use relative font sizes');assert(!/\bfont:[^;{}]*\dpx/.test(css),file+' must scale shorthand fonts too');}
+for(const file of ['style.css','themes.css','timetable.css','auth.css','responsive.css']){const css=fs.readFileSync(path.join(root,file),'utf8');assert(!/font-size:\s*\d+(?:\.\d+)?px/.test(css),file+' must use relative font sizes');assert(!/\bfont:[^;{}]*\dpx/.test(css),file+' must scale shorthand fonts too');}
 console.log('PASS: proportional font scale, safe default, and relative typography across all stylesheets.');
 run(`state.goals=[{id:'goal-1',name:'Health <goal>',icon:'◎',board:'1'},{id:'goal-2',name:'Family goal',board:'2'},{id:'goal-3',name:'Empty goal',board:'1'}];state.boards.push({id:'2',name:'Family & home',role:'viewer'});state.tasks[0].goal='goal-1';state.tasks[0].status='done';state.tasks.push({...state.tasks[0],id:'4',goal:'',title:'Unrelated task'});state.schedule[0].goal='goal-1';state.schedule.push({...state.schedule[0],id:'6',board:'2',title:'Family dinner',goal:'goal-2',trackHabit:false});`);
 const goalList=run('renderGoalList()');
@@ -79,5 +79,7 @@ assert.equal(run("localDay(shiftTimetableAnchor(dateFrom('2026-12-31'),1))"),'20
 run("scheduleAnchor=dateFrom('2028-02-10');renderTimetable()");assert(el('alternate').innerHTML.includes('aria-label="2028-02-29"'));
 run("schedulePeriod='week'");assert.equal(run("localDay(shiftTimetableAnchor(dateFrom('2026-11-09'),1))"),'2026-11-16');
 console.log('PASS: Week default/selected button, Day time grid, Month calendar/tasks/times, leap-day rendering, and period-specific navigation.');
+run("habitPeriod='week';renderHabits()");assert(el('alternate').innerHTML.includes('data-period="week"'));assert(el('alternate').innerHTML.includes('data-day-label="Mon 9"'));assert(page.includes('responsive.css'));assert(page.includes('responsive.js'));assert(page.indexOf('responsive.js')<page.indexOf('actions.js'));assert(page.includes('aria-controls="workspaceNav"'));
+console.log('PASS: responsive assets, navigation controls, and labeled mobile habit rows.');
 
 

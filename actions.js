@@ -39,8 +39,9 @@ function bind(){
  document.addEventListener('dragstart',e=>{const card=e.target.closest('.card');if(card&&canEdit())e.dataTransfer.setData('text/plain',card.dataset.id)});document.addEventListener('dragover',e=>{const col=e.target.closest('.column');if(col&&canEdit()){e.preventDefault();col.classList.add('dragover')}});document.addEventListener('dragleave',e=>e.target.closest('.column')?.classList.remove('dragover'));document.addEventListener('drop',e=>{const col=e.target.closest('.column');if(!col||!canEdit())return;e.preventDefault();col.classList.remove('dragover');const t=state.tasks.find(t=>t.id===e.dataTransfer.getData('text/plain'));if(t&&t.status!==col.dataset.status)run(mutate('task_move',{id:t.id,version:t.version,status:col.dataset.status}))});
  document.querySelectorAll('dialog').forEach(d=>d.addEventListener('close',()=>{if(state.user)setView(view)}));
 }
-async function start(){try{const session=await api('session');csrf=session.csrf;if(!session.user){location.replace('login.php'+location.search);return}restoreNavigation(session.user.id);bind();bindTimetable();await refresh(true);setInterval(()=>{if(!document.hidden&&!pending)run(refresh())},12000);setInterval(()=>document.querySelectorAll('[data-created]').forEach(el=>el.textContent=ageLabel(el.dataset.created)),60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)run(refresh())})}catch(e){$('saveStatus').textContent='Connection failed';toast(e.message)}}
+async function start(){try{const session=await api('session');csrf=session.csrf;if(!session.user){location.replace('login.php'+location.search);return}restoreNavigation(session.user.id);bind();bindTimetable();bindResponsive();await refresh(true);setInterval(()=>{if(!document.hidden&&!pending)run(refresh())},12000);setInterval(()=>document.querySelectorAll('[data-created]').forEach(el=>el.textContent=ageLabel(el.dataset.created)),60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)run(refresh())})}catch(e){$('saveStatus').textContent='Connection failed';toast(e.message)}}
 start();
+
 
 
 
