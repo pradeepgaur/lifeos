@@ -1,0 +1,113 @@
+/* Palette-only styles: keep the compact layout across every theme. */
+.theme-picker{display:flex;align-items:center;gap:7px;margin:0;font-size:0.625rem;font-weight:500;color:#cce2f4;white-space:nowrap}.theme-picker select{width:132px;height:28px;padding:3px 7px;margin:0;background:#ffffff16;color:inherit;border:1px solid #ffffff40;border-radius:5px;font-size:0.625rem;outline-offset:2px}.theme-picker option{background:#fff;color:#243746}
+body[data-theme="facebook"]{--accent:#1877f2;--accent-dark:#1464cf;--canvas:#f0f2f5;--surface:#fff;--panel:#e4e8ee;--text:#1c1e21;--secondary:#606770;--border:#d8dde5;--tint:#e7f1ff;--side:#fff}
+body[data-theme="slate"]{--accent:#52667b;--accent-dark:#3a4d60;--canvas:#eef1f4;--surface:#fff;--panel:#e0e5eb;--text:#273747;--secondary:#617183;--border:#cdd6df;--tint:#e2e9f0;--side:#f8fafc}
+body[data-theme="forest"]{--accent:#21836b;--accent-dark:#176650;--canvas:#f0f5f3;--surface:#fff;--panel:#dfeae5;--text:#234337;--secondary:#627c70;--border:#ccdcd3;--tint:#e0f1e9;--side:#f9fcfa}
+body[data-theme]:not([data-theme="trello"]){background:var(--canvas);color:var(--text);--ink:var(--text);--muted:var(--secondary);--line:var(--border);--bg:var(--canvas)}
+body[data-theme]:not([data-theme="trello"]) main{background:var(--canvas)}
+body[data-theme]:not([data-theme="trello"]) .sidebar{background:var(--side);color:var(--text);border-color:var(--border)}
+body[data-theme]:not([data-theme="trello"]) :is(.brand,.brand-icon,.brand-dot){color:var(--accent)}
+body[data-theme]:not([data-theme="trello"]) .workspace{background:var(--canvas);border-color:var(--border)}
+body[data-theme]:not([data-theme="trello"]) :is(.workspace-icon,nav b){background:var(--tint);color:var(--accent)}
+body[data-theme]:not([data-theme="trello"]) :is(.workspace small,.profile small,.nav-label,nav button,.board-link,.quote small){color:var(--secondary)}
+body[data-theme]:not([data-theme="trello"]) :is(nav .active,.board-link.selected){background:var(--tint);color:var(--accent)}
+body[data-theme]:not([data-theme="trello"]) :is(.quote p,.profile){color:var(--text);border-color:var(--border)}
+body[data-theme]:not([data-theme="trello"]) .quote>span{color:var(--accent)}
+body[data-theme]:not([data-theme="trello"]) header{background:var(--surface);border-color:var(--border);box-shadow:0 1px 3px #172b4d0a}
+body[data-theme]:not([data-theme="trello"]) :is(.breadcrumb,.breadcrumb span,.saved,.theme-picker){color:var(--secondary)}
+body[data-theme]:not([data-theme="trello"]) :is(.breadcrumb strong,.page-heading h1){color:var(--text)}
+body[data-theme]:not([data-theme="trello"]) :is(.page-heading .eyebrow,.page-heading p,footer){color:var(--secondary)}
+body[data-theme]:not([data-theme="trello"]) :is(.page-heading h1 span,.icon-btn){color:var(--accent);border-color:var(--border)}
+body[data-theme]:not([data-theme="trello"]) :is(.dark,.page-heading .dark,.column-create .dark){background:var(--accent);color:#fff}
+body[data-theme]:not([data-theme="trello"]) .goal-strip{background:var(--surface);border-color:var(--border)}
+body[data-theme]:not([data-theme="trello"]) :is(.goal-intro .eyebrow,.goal-progress){color:var(--secondary)}
+body[data-theme]:not([data-theme="trello"]) .goal-intro a{color:var(--accent)}
+body[data-theme]:not([data-theme="trello"]) .goal-card{background:var(--canvas);border:1px solid var(--border)}
+body[data-theme]:not([data-theme="trello"]) :is(.goal-icon,.goal-card:nth-child(2) .goal-icon,.goal-card:nth-child(3) .goal-icon){background:var(--tint);color:var(--accent)}
+body[data-theme]:not([data-theme="trello"]) .goal-create{background:var(--canvas);border-color:var(--border)}
+body[data-theme]:not([data-theme="trello"]) :is(.goal-create input,.goal-create button){color:var(--accent)}
+body[data-theme]:not([data-theme="trello"]) .goal-create input::placeholder{color:var(--secondary)}
+body[data-theme]:not([data-theme="trello"]) .tabs button{color:var(--secondary)}
+body[data-theme]:not([data-theme="trello"]) .tabs button.active{background:var(--accent);color:#fff}
+body[data-theme]:not([data-theme="trello"]) :is(.filter-left .search,.filter-left .filter){background:var(--surface);border-color:var(--border);color:var(--secondary)}
+body[data-theme]:not([data-theme="trello"]) .filter-left .search input{color:var(--text)}
+body[data-theme]:not([data-theme="trello"]) .filter-left .search input::placeholder{color:var(--secondary)}
+body[data-theme]:not([data-theme="trello"]) .filter-left .filter.on{background:var(--tint);color:var(--accent);border-color:var(--accent)}
+body[data-theme]:not([data-theme="trello"]) .invite{color:var(--accent)}
+body[data-theme]:not([data-theme="trello"]) .private{color:var(--secondary)}
+body[data-theme]:not([data-theme="trello"]) .divider{background:var(--border)}
+body[data-theme]:not([data-theme="trello"]) .avatar-stack .avatar{border-color:var(--canvas)}
+body[data-theme]:not([data-theme="trello"]) .column{background:var(--panel)}
+body[data-theme]:not([data-theme="trello"]) :is(.column-head,.card h3){color:var(--text)}
+body[data-theme]:not([data-theme="trello"]) :is(.column-head button,.add-card,.card-meta){color:var(--secondary)}
+body[data-theme]:not([data-theme="trello"]) .count{background:var(--surface);color:var(--secondary)}
+body[data-theme]:not([data-theme="trello"]) .card{background:var(--surface)}
+body[data-theme]:not([data-theme="trello"]) .card:hover{background:var(--surface);box-shadow:0 1px 4px #172b4d35;outline:1px solid var(--accent)}
+body[data-theme]:not([data-theme="trello"]) .column.dragover{background:var(--tint);outline:1px solid var(--accent)}
+body[data-theme]:not([data-theme="trello"]) .column-create{background:var(--surface);border-color:var(--border)}
+body[data-theme]:not([data-theme="trello"]) .column-create>span{color:var(--secondary)}
+body[data-theme]:not([data-theme="trello"]) :is(#alternate>h3,.calendar-grid>div:not(.calendar-day)){color:var(--text)}
+body[data-theme]:not([data-theme="trello"]) #alternate>.hint{color:var(--secondary)}
+body[data-theme]:not([data-theme="trello"]) .theme-picker select{background:var(--canvas);border-color:var(--border);color:var(--text)}
+body[data-theme]:not([data-theme="trello"]) #toast{background:var(--accent-dark)}
+@media(max-width:760px){.theme-picker>span{display:none}.theme-picker select{width:116px}.header-actions{gap:9px}}
+.board-section{display:block;min-width:0}.board-toolbar{width:100%}#alternate{width:100%;min-width:0}#alternate[hidden]{display:none}.task-table-wrap{overflow-x:auto;border:1px solid var(--border,#ccd9e4);border-radius:7px;background:var(--surface,#fff)}.task-table{border-collapse:collapse;width:100%;text-align:left;color:var(--text,#253b51);font-size:0.75rem;table-layout:fixed}.task-table th{background:var(--panel,#e9eff5);font-size:0.625rem;font-weight:600;color:var(--secondary,#637b90);padding:10px 13px}.task-table th:first-child{width:52%}.task-table th:nth-child(2){width:13%}.task-table th:nth-child(3){width:23%}.task-table th:last-child{width:12%}.task-table td{padding:8px 13px;border-top:1px solid var(--border,#e0e7ed);overflow-wrap:anywhere}.task-table tbody tr{cursor:pointer}.task-table tbody tr:hover{background:var(--tint,#e7f1ff)}.list-task-title{display:block;width:100%;text-align:left;font-size:0.75rem;line-height:1.4;padding:0;color:inherit}.list-task-title:focus-visible{outline:2px solid var(--accent,#1877f2);outline-offset:3px}.task-table .priority{font-size:0.625rem;white-space:nowrap}.list-status{display:inline-block;padding:3px 7px;background:var(--panel,#e9eff5);border-radius:4px;font-size:0.625rem;line-height:1.3}.list-due{font-size:0.625rem;color:var(--secondary,#637b90);white-space:nowrap}.list-empty{background:var(--surface,#fff);border:1px solid var(--border,#dce4eb);border-radius:7px;color:var(--secondary,#637b90)}@media(max-width:760px){.task-table{min-width:540px}.task-table th:first-child{width:46%}.task-table th:nth-child(3){width:26%}.task-table th:nth-child(2){width:15%}.task-table th:last-child{width:13%}}
+.list-group{margin:0 0 13px;border:1px solid var(--border,#c5d5e2);border-radius:7px;overflow:hidden;background:var(--surface,#fff)}.list-group-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;background:var(--panel,#e9eff5)}.list-group-header h2{display:flex;align-items:center;gap:8px;font-size:0.75rem;font-weight:600;line-height:20px;color:var(--text,#294962);margin:0}.list-group-header .count{font-size:0.5625rem;font-weight:400}.list-add{font-size:0.625rem;color:var(--accent,#1877f2);padding:4px 7px;border-radius:4px;white-space:nowrap}.list-add:hover{background:var(--surface,#fff)}.list-group .task-table-wrap{border:0;border-radius:0}.list-group .task-table th{background:var(--surface,#fff);padding:6px 13px;font-size:0.5625rem}.list-group .task-table td{padding-top:7px;padding-bottom:7px}.list-goal{font-size:0.625rem;color:var(--secondary,#637b90)}.list-group-empty{font-size:0.6875rem;color:var(--secondary,#637b90);padding:12px 13px}.list-add:focus-visible{outline:2px solid var(--accent,#1877f2);outline-offset:2px}
+.task-table tbody .list-column-heading{cursor:default}.task-table tbody .list-column-heading:hover{background:transparent}.task-table .list-column-heading th{font-size:0.75rem;font-weight:700;color:var(--text,#294962);background:var(--panel,#e9eff5);padding:8px 13px;border-top:1px solid var(--border,#dce4eb);text-align:left}
+.item-age{font-size:0.5625rem;color:var(--secondary,#637b90);white-space:nowrap;font-weight:400}.goal-progress .item-age{font-size:0.5rem}.card-meta{flex-wrap:wrap;column-gap:7px;row-gap:0}.card-bottom{height:auto;min-height:18px}.task-table th:first-child{width:44%}.task-table th:nth-child(2){width:12%}.task-table th:nth-child(3){width:22%}.task-table th:nth-child(4){width:12%}.task-table th:last-child{width:10%}.list-age{white-space:nowrap}.goal-age{font-weight:400;margin-left:8px}.goal-age .item-age{color:inherit}.task-created{margin:0 0 12px}@media(max-width:760px){.task-table{min-width:620px}}
+/* Additional palettes inspired by familiar productivity workspaces. */
+body[data-theme="notion"]{--accent:#45433f;--accent-dark:#292824;--canvas:#fff;--surface:#fff;--panel:#f1f0ed;--text:#37352f;--secondary:#78766f;--border:#e5e3df;--tint:#eeedea;--side:#f7f7f5}
+body[data-theme="asana"]{--accent:#bf5061;--accent-dark:#9b3546;--canvas:#fcf5f3;--surface:#fff;--panel:#f3e7e4;--text:#413a40;--secondary:#816c76;--border:#e9d9d8;--tint:#fce7e9;--side:#fff9f7}
+body[data-theme="monday"]{--accent:#5754d5;--accent-dark:#3e3bad;--canvas:#f4f5fc;--surface:#fff;--panel:#e8eafa;--text:#32334f;--secondary:#6c6e8b;--border:#dcdff0;--tint:#edecff;--side:#f9f9ff}
+body[data-theme="linear"]{color-scheme:dark;--accent:#a49bff;--accent-dark:#6258c4;--canvas:#14151a;--surface:#202127;--panel:#292b34;--text:#e8e9f1;--secondary:#a1a5b6;--border:#383b47;--tint:#34304f;--side:#191a20}
+body[data-theme="todoist"]{--accent:#c74638;--accent-dark:#a03127;--canvas:#faf9f7;--surface:#fff;--panel:#f0eae5;--text:#382f2b;--secondary:#7e716b;--border:#e6dcd5;--tint:#fbe8e4;--side:#fcf5f0}
+body[data-theme]:not([data-theme="trello"]) :is(dialog,label input,label textarea,label select,.inline-add input){background:var(--surface);color:var(--text);border-color:var(--border);outline-color:var(--accent)}
+body[data-theme]:not([data-theme="trello"]) :is(.inline-add button,.comment,.list-status){background:var(--panel);color:var(--text)}
+body[data-theme]:not([data-theme="trello"]) :is(.comment strong,.goal-badge){color:var(--accent)}
+body[data-theme]:not([data-theme="trello"]) :is(dialog p,.hint,.close){color:var(--secondary)}
+body[data-theme]:not([data-theme="trello"]) .column-create input{background:var(--surface);color:var(--text);border-color:var(--border)}
+body[data-theme]:not([data-theme="trello"]) .quick-task input{background:var(--surface);color:var(--text);border-color:var(--accent)}
+body[data-theme]:not([data-theme="trello"]) .quick-task button{background:var(--accent-dark);color:#fff}
+body[data-theme]:not([data-theme="trello"]) .calendar-day{background:var(--surface);color:var(--text);border-color:var(--border)}
+body[data-theme]:not([data-theme="trello"]) .calendar-task{background:var(--tint);color:var(--text)}
+body[data-theme]:not([data-theme="trello"]) .list-row{background:var(--surface);color:var(--text);border-color:var(--border)}
+body[data-theme="linear"] :is(.dark,.page-heading .dark,.column-create .dark){background:#8175e8;color:#fff}
+body[data-theme="linear"] .theme-picker option{background:var(--surface);color:var(--text)}
+body[data-theme="linear"] .progress-track{background:#393d49}
+body[data-theme="linear"] .tag,body[data-theme="linear"] .tag.growth{background:#383247;color:#d0bff2}
+body[data-theme="linear"] .tag.work{background:#243c53;color:#9dcef3}
+body[data-theme="linear"] .tag.home{background:#3d3831;color:#ddc8a6}
+body[data-theme="linear"] .tag:not(.growth):not(.work):not(.home){background:#253e36;color:#a5d8c5}
+body[data-theme="linear"] .priority.High{color:#f4a0ab}
+body[data-theme="linear"] .priority.Medium{color:#9ecbfa}
+body[data-theme="linear"] .priority.Low{color:#bac2d1}
+body[data-theme="linear"] .done .card h3{color:#a0bfb6}
+body[data-theme="linear"] .goal-card{background:#24252d}
+body[data-theme="linear"] .me{background:#344060;color:#c1d6ff}
+body[data-theme="linear"] .rose{background:#573a46;color:#f2c0cd}
+body[data-theme="linear"] .sage{background:#2d4a42;color:#b8e5d6}
+body[data-theme="linear"] .lavender{background:#413c5b;color:#d3c9f9}
+/* Keep board navigation at the viewport edge; long columns scroll independently. */
+main{height:100dvh;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+main>header{flex-shrink:0}
+.page{flex:1;min-height:0;width:100%;display:flex;flex-direction:column;margin:0 auto;padding-bottom:0}
+.page-heading,.goal-strip{flex-shrink:0}
+.board-section{flex:1;min-height:0;display:flex;flex-direction:column}
+.board-toolbar{flex-shrink:0}
+.board{flex:1;min-height:0;margin:0;padding-bottom:0;overflow-x:auto;overflow-y:hidden;grid-template-rows:minmax(0,1fr)}
+.board>.column,.board>.column-create{max-height:100%;min-height:0;overflow-y:auto;scrollbar-width:thin}
+#alternate{flex:1;min-height:0;overflow:auto;padding-bottom:12px}
+.page>footer{display:none}
+@media(max-width:760px){.page{padding-bottom:0}}
+/* Connected workspace controls. */
+[hidden]{display:none!important}.read-only .column-head button,.read-only .add-card,.read-only .column-create,.read-only .quick-task{display:none!important}.goal-placeholder{font-size:0.6875rem;color:var(--secondary,#cce2f4);align-self:center}.goal-edit{font-size:0.625rem;color:var(--accent,#bde0fa);margin-left:8px}.member-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border,#dce4eb);font-size:0.6875rem}.member-row>div,.member-row>span:first-child{flex:1;min-width:0;overflow-wrap:anywhere}.member-row small{display:block;margin-top:4px;color:var(--secondary,#738799)}.member-row select{padding:5px;border:1px solid var(--border,#cbd9e4);border-radius:4px;background:var(--surface,#fff);color:var(--text,#294962);font-size:0.625rem}.member-row button{font-size:0.625rem;color:#b34e5d}.column-setting{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin:10px 0;padding:9px;background:var(--panel,#e9eff5);border-radius:6px}.column-setting>input{flex:1;min-width:120px;width:140px;padding:7px;border:1px solid var(--border,#cbd9e4);border-radius:4px;background:var(--surface,#fff);color:var(--text,#294962);font-size:0.6875rem}.column-setting label{display:flex;gap:4px;align-items:center;margin:0;font-size:0.5625rem;white-space:nowrap}.column-setting label input{width:auto;margin:0}.column-setting button{padding:5px;font-size:0.625rem;color:var(--accent,#286c9f)}button:disabled{opacity:.45;cursor:default}.mobile-boards{display:none}.comment small{font-weight:400;font-size:0.5625rem}.sidebar #boardNav{overflow-y:auto;max-height:35vh}.sidebar .quote{padding:10px}.sidebar .quote p{font-size:0.8125rem}.profile{padding-top:12px}dialog p{overflow-wrap:anywhere}#settingsDialog{width:620px}#inviteList h3{font-size:0.75rem}body:not([data-theme="trello"]) .today-list{color:var(--text)}@media(max-width:760px){.mobile-boards{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-shrink:0}.mobile-boards select{min-width:0;flex:1;padding:7px;background:var(--surface,#fff);border:1px solid var(--border,#cbd9e4);border-radius:5px;color:var(--text,#294962);font-size:0.6875rem}.mobile-boards .button{font-size:0.625rem}.collab .private{display:none}}
+body[data-theme].has-board-background main{background-size:cover;background-position:center center;background-repeat:no-repeat}.has-board-background .page-heading{background:var(--surface,#155587);padding:10px 12px;border-radius:7px}.has-board-background .board-toolbar{background:var(--surface,#155587);border-radius:6px;padding:5px 8px;margin-bottom:7px}.has-board-background #alternate>.period-toolbar,.has-board-background #alternate>.schedule-help{background:var(--surface,#155587);padding:8px;border-radius:5px}.has-board-background #backgroundForm{margin:18px 0;padding:12px;background:var(--panel,#e9eff5);border-radius:7px}.has-board-background .goal-strip{background:var(--surface,#155587)}
+.background-error{padding:10px;border:1px solid #d69aa1;border-radius:5px;background:#fff0f1;color:#9c3442!important;font-size:0.6875rem;line-height:1.6;overflow-wrap:anywhere}
+
+
+
+/* Account-wide typography, including small card labels. */
+body .card .priority,body .task-table .priority{font-size:0.6875rem;font-weight:650;line-height:1.4}
+body .card .tag{font-size:0.625rem;line-height:1.4}
+body .card .tags{line-height:normal;flex-wrap:wrap;row-gap:3px}
+.account-settings{font-size:0.6875rem;white-space:nowrap;padding:6px 9px;border:1px solid var(--border,#ffffff40);border-radius:5px;color:var(--accent,#e3f2ff)}

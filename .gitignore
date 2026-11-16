@@ -1,0 +1,10 @@
+/private/config.php
+/private/install.lock
+/tests/.runtime/
+/lifeos-hosting.zip
+/tests/*.jpg
+/tests/*.png
+*.log
+.env
+.env.*
+!.env.example
