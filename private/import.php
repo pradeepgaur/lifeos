@@ -5,6 +5,8 @@ function import_prototype($data,$uid){
     $boards=$data['boards'] ?? array();$tasks=$data['tasks'] ?? array();$goals=$data['goals'] ?? array();$columns=$data['columns'] ?? array();
     if(!is_array($boards)||!is_array($tasks)||!is_array($goals)||!is_array($columns)||count($boards)>100||count($tasks)>3000||count($goals)>1000||count($boards)*count($goals)>5000)fail('Prototype is too large for a single import.');
     $maps=array();$goalMaps=array();$first=null;
+    $sharedGoals=array();
+    foreach($goals as $g){if(!is_array($g))fail('Invalid prototype goal.');query('INSERT INTO lifeos_goals(owner_id,name,description,priority,created_at) VALUES(?,?,?,?,?)',array($uid,text_value($g,'name',150),text_value($g,'description',10000,false),'Medium',import_date($g['createdAt'] ?? null)));$sharedGoals[(string)($g['id'] ?? '')]=(string)db()->lastInsertId();}
     foreach($boards as $name){
         $label=text_value(array('name'=>$name),'name',80);if(isset($maps[$label]))continue;
         $bid=create_board($uid,$label.' (imported)');if(!$first)$first=$bid;$maps[$label]=$bid;
@@ -15,11 +17,7 @@ function import_prototype($data,$uid){
             if(!is_string($key)||!preg_match('/^[a-zA-Z0-9_-]{1,60}$/',$key))fail('Invalid prototype column ID.');$title=text_value(array('name'=>$title),'name',80);
             query('INSERT INTO lifeos_columns(board_id,id,name,position,is_done) VALUES(?,?,?,?,?) ON DUPLICATE KEY UPDATE name=VALUES(name)',array($bid,$key,$title,$position++,$key==='done'?1:0));
         }
-        // Prototype goals were global, so copy them into each imported board.
-        foreach($goals as $g){
-            if(!is_array($g))fail('Invalid prototype goal.');$gid=(string)($g['id'] ?? '');$created=import_date($g['createdAt'] ?? null);
-            query('INSERT INTO lifeos_goals(board_id,name,description,priority,created_at) VALUES(?,?,?,?,?)',array($bid,text_value($g,'name',150),text_value($g,'description',10000,false),'Medium',$created));$goalMaps[$label][$gid]=(string)db()->lastInsertId();
-        }
+        foreach($sharedGoals as $old=>$id){query('INSERT INTO lifeos_board_goals(board_id,goal_id) VALUES(?,?)',array($bid,$id));$goalMaps[$label][$old]=$id;}
     }
     foreach($tasks as $t){
         if(!is_array($t))fail('Invalid prototype task.');$label=$t['board'] ?? '';if(!is_string($label)||!isset($maps[$label]))fail('A task references a missing prototype board.');$bid=$maps[$label];

@@ -4,6 +4,8 @@ date_default_timezone_set('UTC');
 ini_set('display_errors', '0');
 ini_set('session.use_strict_mode', '1');
 ini_set('session.use_only_cookies', '1');
+define('LIFEOS_LOGIN_LIFETIME',7*24*60*60);
+ini_set('session.gc_maxlifetime',(string)LIFEOS_LOGIN_LIFETIME);
 header('X-Content-Type-Options: nosniff');
 header('X-Frame-Options: DENY');
 header('Referrer-Policy: no-referrer');
@@ -14,9 +16,9 @@ $base = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
 $base = rtrim($base, '/') . '/';
 session_name('lifeos_' . substr(hash('sha256', __DIR__), 0, 12));
 if (PHP_VERSION_ID >= 70300) {
-    session_set_cookie_params(array('lifetime'=>0,'path'=>$base,'secure'=>$secure,'httponly'=>true,'samesite'=>'Lax'));
+    session_set_cookie_params(array('lifetime'=>LIFEOS_LOGIN_LIFETIME,'path'=>$base,'secure'=>$secure,'httponly'=>true,'samesite'=>'Lax'));
 } else {
-    session_set_cookie_params(0, $base . '; SameSite=Lax', '', $secure, true);
+    session_set_cookie_params(LIFEOS_LOGIN_LIFETIME, $base . '; SameSite=Lax', '', $secure, true);
 }
 session_start();
 if (empty($_SESSION['csrf'])) $_SESSION['csrf'] = bin2hex(random_bytes(32));
@@ -30,13 +32,17 @@ function ensure_schema($pdo) {
     // Upgrade before any application transaction. DDL is deliberately outside transactions.
     try{$version=(int)$pdo->query('SELECT schema_version FROM lifeos_meta WHERE id=1')->fetchColumn();}
     catch(PDOException $e){if($e->getCode()!=='42S22')throw $e;$pdo->exec('ALTER TABLE lifeos_meta ADD schema_version INT NOT NULL DEFAULT 1');$version=1;}
-    if($version>=5)return;
+    if($version>=8)return;
     $config=require config_path();$name='lifeos-migrate-'.substr(hash('sha256',$config['database']),0,32);$stmt=$pdo->prepare('SELECT GET_LOCK(?,10)');$stmt->execute(array($name));if(!$stmt->fetchColumn())throw new RuntimeException('Schema update busy. Retry shortly.');
     try{
-        $schema=require __DIR__.'/schema.php';foreach(array('schedule','habit_checks','backgrounds') as $table)$pdo->exec(str_replace('CREATE TABLE ','CREATE TABLE IF NOT EXISTS ',$schema[$table]));
+        $version=(int)$pdo->query('SELECT schema_version FROM lifeos_meta WHERE id=1')->fetchColumn();if($version>=8)return;
+        $schema=require __DIR__.'/schema.php';foreach(array('schedule','habit_checks','backgrounds','logins') as $table)$pdo->exec(str_replace('CREATE TABLE ','CREATE TABLE IF NOT EXISTS ',$schema[$table]));
         foreach(array('users','boards') as $table){try{$pdo->exec('ALTER TABLE lifeos_'.$table.' ADD sync_revision BIGINT NOT NULL DEFAULT 1');}catch(PDOException $e){if($e->getCode()!=='42S21')throw $e;}}
         try{$pdo->exec('ALTER TABLE lifeos_users ADD font_scale SMALLINT NOT NULL DEFAULT 112');}catch(PDOException $e){if($e->getCode()!=='42S21')throw $e;}
-        $pdo->exec('UPDATE lifeos_meta SET schema_version=5 WHERE id=1');
+        require_once __DIR__.'/workspace-migration.php';
+        if($version<7)migrate_workspace($pdo,$schema);
+        foreach(array('start_time','end_time') as $field){try{$pdo->exec('ALTER TABLE lifeos_tasks ADD '.$field.' CHAR(5) NULL');}catch(PDOException $e){if($e->getCode()!=='42S21')throw $e;}}
+        $pdo->exec('UPDATE lifeos_meta SET schema_version=8 WHERE id=1');
     }
     finally{$stmt=$pdo->prepare('SELECT RELEASE_LOCK(?)');$stmt->execute(array($name));}
 }
@@ -59,12 +65,14 @@ function password_value($v) { if(!is_string($v)||strlen($v)<10||strlen($v)>72) f
 function csrf_check($token) { if(!is_string($token)||!hash_equals($_SESSION['csrf'],$token)) fail('Your session changed. Reload the page and try again.',419); }
 function current_user() {
     if(empty($_SESSION['uid'])) fail('Please sign in.',401);
-    if(empty($_SESSION['last'])||time()-$_SESSION['last']>43200){$_SESSION=array();fail('Session expired. Please sign in.',401);}
-    $u=row('SELECT * FROM lifeos_users WHERE id=?',array($_SESSION['uid']));
-    if(!$u || (int)$u['session_version']!==(int)$_SESSION['sv']){$_SESSION=array();fail('Please sign in again.',401);}
-    $_SESSION['last']=time(); return $u;
+    if(empty($_SESSION['last'])||time()-$_SESSION['last']>LIFEOS_LOGIN_LIFETIME){revoke_browser_login();$_SESSION=array();fail('Sign-in expired after seven days of inactivity. Please sign in.',401);}
+    $u=!empty($_SESSION['login_selector'])
+        ?row('SELECT u.* FROM lifeos_users u JOIN lifeos_logins l ON l.user_id=u.id AND l.session_version=u.session_version WHERE u.id=? AND l.selector=? AND l.expires_at>UTC_TIMESTAMP()',array($_SESSION['uid'],$_SESSION['login_selector']))
+        :row('SELECT * FROM lifeos_users WHERE id=?',array($_SESSION['uid']));
+    if(!$u || (int)$u['session_version']!==(int)$_SESSION['sv']){revoke_browser_login();$_SESSION=array();fail('Please sign in again.',401);}
+    renew_browser_login($u);$_SESSION['last']=time(); return $u;
 }
-function sign_in($u) { session_regenerate_id(true); $_SESSION['uid']=$u['id']; $_SESSION['sv']=$u['session_version']; $_SESSION['last']=time(); $_SESSION['csrf']=bin2hex(random_bytes(32)); }
+function sign_in($u) { if(!empty($_SESSION['login_selector']))revoke_browser_login();session_regenerate_id(true); $_SESSION['uid']=$u['id']; $_SESSION['sv']=$u['session_version']; $_SESSION['last']=time(); $_SESSION['csrf']=bin2hex(random_bytes(32));remember_browser($u); }
 function public_user($u) { return array('id'=>(string)$u['id'],'name'=>$u['name'],'email'=>$u['email'],'theme'=>$u['theme'],'fontScale'=>(int)$u['font_scale']); }
 function utc_iso($v) { return $v ? str_replace(' ','T',$v).'Z' : null; }
 function revision() {
@@ -97,3 +105,5 @@ function throttle($label,$max=12) {
     $v=row('SELECT attempts FROM lifeos_attempts WHERE bucket=?',array($bucket)); if((int)$v['attempts']>$max) fail('Too many attempts. Try again in 15 minutes.',429);
     if(random_int(1,50)===1)query('DELETE FROM lifeos_attempts WHERE window_start<?',array($now-86400));
 }
+require __DIR__.'/sessions.php';
+restore_browser_login();

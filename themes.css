@@ -133,3 +133,54 @@ body[data-view="goals"] .filter-left,body[data-view="overview"] .filter-left{dis
 @media(max-width:900px){.goal-linked-item{flex-wrap:wrap;gap:5px 8px}.goal-linked-title{flex-basis:calc(100% - 25px)}.goal-item-pills{max-width:100%;margin-left:22px;justify-content:flex-start}.goal-accordion .goal-age{display:none}}
 @media(max-width:600px){.goal-board-label{display:none}.goal-accordion>summary{padding-right:70px}.goal-children{margin-left:13px;margin-right:6px;padding-left:6px}.goal-compact-edit{right:7px}}
 .goal-pill[class*="goal-priority-"]{font-size:.6875rem;font-weight:600}
+
+/* Different directions: quiet, warm, cool, and dark. */
+body[data-theme="mono"]{--accent:#222222;--accent-dark:#000000;--canvas:#ededed;--surface:#ffffff;--panel:#dedede;--text:#202020;--secondary:#616161;--border:#c6c6c6;--tint:#e2e2e2;--side:#fafafa}
+body[data-theme="linen"]{--accent:#7c583b;--accent-dark:#60422b;--canvas:#f2ede4;--surface:#fffdf7;--panel:#e6ddce;--text:#3d352d;--secondary:#756859;--border:#d5c9b7;--tint:#eee1ce;--side:#f9f5ec}
+body[data-theme="wine"]{--accent:#903c58;--accent-dark:#712b43;--canvas:#f5edef;--surface:#fffafb;--panel:#ead9df;--text:#432c36;--secondary:#7e606c;--border:#d9bfc9;--tint:#f0dce4;--side:#fcf4f7}
+body[data-theme="lavender"]{--accent:#74609a;--accent-dark:#59477c;--canvas:#f0edf5;--surface:#ffffff;--panel:#e2dcea;--text:#362f42;--secondary:#766b84;--border:#cfc5dc;--tint:#e9e1f3;--side:#f9f7fc}
+body[data-theme="mono"] :is(.progress-track i,.goal-card:nth-child(2) .progress-track i,.goal-card:nth-child(3) .progress-track i){background:#555}
+body[data-theme="linen"] .progress-track i{background:#96805d}
+body[data-theme="wine"] .progress-track i{background:#a25875}
+body[data-theme="lavender"] .progress-track i{background:#9180b1}
+
+/* Stronger ink throughout light palettes, including small metadata. */
+body[data-theme]:not([data-theme="linear"]):not([data-theme="trello"]){--text:#202024;--secondary:#45454d}
+body[data-theme="linen"]{--text:#29231e;--secondary:#51483e}
+body[data-theme="wine"]{--text:#2b2026;--secondary:#57424c}
+body[data-theme="lavender"]{--text:#25212d;--secondary:#4d435b}
+body[data-theme="mono"]{--text:#191919;--secondary:#444}
+body[data-theme]:not([data-theme="linear"]):not([data-theme="trello"]) :is(.card-meta,.goal-progress,.item-age,.goal-placeholder,.schedule-help,.goal-item-count,.goal-board-label,.goal-age,.goal-empty-message,.list-due,.list-age,.hint,.card .tag,.card .tag.work,.card .tag.home,.card .tag.growth){color:var(--secondary)}
+body[data-theme]:not([data-theme="linear"]):not([data-theme="trello"]) :is(input,textarea)::placeholder{color:var(--secondary);opacity:1}
+body[data-theme]:not([data-theme="linear"]):not([data-theme="trello"]) :is(.card h3,.done .card h3,.goal-card-top,.column-head,.column-name,.list-task-title,.goal-linked-title){color:var(--text)}
+body[data-theme]:not([data-theme="linear"]):not([data-theme="trello"]) .priority.High{color:#a82136}
+body[data-theme]:not([data-theme="linear"]):not([data-theme="trello"]) .priority.Medium{color:#235a86}
+body[data-theme]:not([data-theme="linear"]):not([data-theme="trello"]) .priority.Low{color:#4c5662}
+
+body[data-theme="trello"] :is(.card h3,.done .card h3,.column-head,.goal-card-top){color:#202024}
+body[data-theme="trello"] :is(.card-meta,.goal-progress,.card .item-age,.goal-card .item-age,.add-card){color:#45454d}
+body[data-theme="trello"] .priority.High{color:#a82136}body[data-theme="trello"] .priority.Medium{color:#235a86}body[data-theme="trello"] .priority.Low{color:#4c5662}
+
+/* Stronger goal-strip contrast without adding visual weight elsewhere. */
+body[data-theme]:not([data-theme="linear"]):not([data-theme="trello"]) .goal-strip{border-color:var(--border)}
+body[data-theme]:not([data-theme="linear"]):not([data-theme="trello"]) .goal-strip :is(.goal-card-top,.goal-intro .eyebrow,.goal-create input,.goal-create button){color:var(--text)}
+.goal-strip .goal-card-top{font-weight:600}
+.goal-strip .goal-intro .eyebrow{font-weight:800;letter-spacing:.7px}
+.goal-strip .goal-intro a,.goal-strip .goal-actions #manageBoardGoals{font-weight:600}
+body[data-theme]:not([data-theme="linear"]):not([data-theme="trello"]) .goal-strip .goal-create input::placeholder{color:var(--text);opacity:1}
+
+
+body[data-theme]:not([data-theme="linear"]):not([data-theme="trello"]) .goal-strip .goal-progress{color:var(--text)}
+body[data-theme]:not([data-theme="linear"]):not([data-theme="trello"]) .goal-strip .goal-progress .item-age{color:var(--secondary)}
+body[data-theme="trello"] .goal-strip :is(.goal-card-top,.goal-create input){color:#202024}
+
+body[data-theme="trello"] .goal-strip .goal-create input::placeholder{color:#353c47;opacity:1}
+
+/* Link colors remain distinct from the goal strip's dark text. */
+body[data-theme]{--goal-link:var(--accent,#1877f2)}
+body[data-theme="mono"]{--goal-link:#205da8}
+body[data-theme="linen"]{--goal-link:#865020}
+body[data-theme="wine"]{--goal-link:#98355c}
+body[data-theme="lavender"]{--goal-link:#6841ad}
+body[data-theme="trello"]{--goal-link:#d2eeff}
+body[data-theme="linear"]{--goal-link:#bfb1ff}

@@ -40,3 +40,126 @@ dialog{width:min(620px,calc(100vw - 32px));max-width:calc(100vw - 32px);max-heig
 @media(prefers-reduced-motion:reduce){.sidebar,.goal-accordion>summary::before{transition:none}}
 @media(max-width:600px){body[data-view="timetable"] .goal-strip,body[data-view="habits"] .goal-strip,body[data-view="timetable"] .board-toolbar,body[data-view="habits"] .board-toolbar,body[data-view="timetable"] .page-heading .eyebrow,body[data-view="habits"] .page-heading .eyebrow,body[data-view="timetable"] .page-heading p,body[data-view="habits"] .page-heading p{display:none}body[data-view="timetable"] .page-heading,body[data-view="habits"] .page-heading{margin-bottom:12px}body[data-view="goals"] .board-toolbar,body[data-view="overview"] .board-toolbar{display:none}}
 @media(max-width:420px){body[data-view="timetable"] .page-heading,body[data-view="habits"] .page-heading{flex-wrap:wrap}body[data-view="timetable"] .page-heading>div,body[data-view="habits"] .page-heading>div{flex-basis:100%}body[data-view="timetable"] .page-heading .button,body[data-view="habits"] .page-heading .button{margin-left:auto;min-height:38px}.habit-view-buttons input{flex-basis:100%;width:100%}}
+
+body[data-view="timetable"] #mobileBoard,body[data-view="habits"] #mobileBoard,body[data-view="goals"] #mobileBoard,body[data-view="overview"] #mobileBoard,body[data-view="today"] #mobileBoard{display:none}body[data-view="timetable"] .board-toolbar,body[data-view="habits"] .board-toolbar{display:none}.today-routines input[type="checkbox"]{width:18px;height:18px;margin:0}
+@media(max-width:600px){.goal-strip #manageBoardGoals{font-size:.625rem;padding:7px}.goal-strip .goal-create{flex-basis:95px;width:95px}}
+
+/* Compact goal strip: cards and creation field share one rhythm. */
+body[data-view="board"] .page-heading p{display:none}
+.page-heading h1{margin:3px 0 8px}
+.goal-strip{--goal-height:3.25rem;align-items:center;padding:8px 10px;gap:10px;margin:10px 0}
+#goalCards{align-items:center;padding-bottom:3px;flex-basis:0}
+.goal-strip .goal-card{height:var(--goal-height);flex-shrink:0;padding:5px 9px;display:flex;flex-direction:column;justify-content:center;gap:3px}
+.goal-strip .goal-card-top{line-height:1.1rem;flex-shrink:0}
+.goal-strip .goal-progress{margin:0;line-height:.75rem;flex-shrink:0}
+.goal-strip .progress-track{height:3px;flex-shrink:0}
+.goal-strip .goal-create{height:var(--goal-height);align-self:center;flex:0 0 150px;width:150px}
+.goal-strip .goal-create input{height:100%;margin:0;padding:0 10px;font-size:.6875rem}
+.goal-strip .goal-create button{height:100%;min-height:0;padding:0 10px}
+.goal-strip #manageBoardGoals{height:var(--goal-height);padding:0 12px;border:1px solid var(--border,#83b3d7);border-radius:6px;font-size:.6875rem}
+@media(max-width:600px){.goal-strip{padding:7px;gap:7px}.goal-strip .goal-create{flex-basis:108px;width:108px}.goal-strip #manageBoardGoals{padding:0 8px;font-size:.625rem}body[data-view="goals"] .goal-strip .goal-create,body[data-view="overview"] .goal-strip .goal-create{flex:1;width:100%}}
+
+/* Link and creation field share the compact goal-card height. */
+.goal-actions{height:var(--goal-height);flex:0 0 150px;min-width:0;display:flex;flex-direction:column;gap:4px;align-self:center}
+.goal-strip .goal-actions #manageBoardGoals{height:auto;min-height:0;flex:1 1 0;width:auto;align-self:flex-start;padding:0 2px;border:0;border-radius:0;background:none;box-shadow:none;color:var(--accent,#e5f3ff);font-size:.625rem;font-weight:500;line-height:1;text-align:left;text-decoration:underline;text-underline-offset:2px}
+.goal-strip .goal-actions .goal-create{height:auto;min-height:0;flex:3 1 0;width:100%;align-self:stretch}
+.goal-strip .goal-actions .goal-create input{min-height:0;padding:0 9px;font-size:.625rem}
+.goal-strip .goal-actions .goal-create button{min-height:0;padding:0 9px}
+.goal-actions #manageBoardGoals:focus-visible{outline:2px solid var(--accent,#e5f3ff);outline-offset:3px}
+@media(max-width:600px){.goal-actions{flex-basis:108px}body[data-view="goals"] .goal-actions,body[data-view="overview"] .goal-actions{flex:1}body[data-view="goals"] .goal-strip .goal-actions .goal-create,body[data-view="overview"] .goal-strip .goal-actions .goal-create{flex:3 1 0}}
+
+/* Distinct end caps frame the scrollable goal cards. */
+.goal-strip .goal-intro,.goal-strip .goal-actions{background:var(--tint,#ffffff18);border:1px solid var(--border,#ffffff30);border-radius:6px}
+.goal-strip .goal-intro{display:flex;flex:0 0 130px;min-width:0;width:auto;align-self:stretch;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px;text-align:center;margin:0}
+.goal-strip .goal-intro .eyebrow{display:block;line-height:1.4}
+.goal-strip .goal-intro a{display:block;margin:0;text-align:center}
+.goal-strip .goal-actions{height:calc(var(--goal-height) + 8px);padding:4px 7px;align-items:center}
+.goal-strip .goal-actions #manageBoardGoals{align-self:center;text-align:center}
+.goal-strip .goal-actions .goal-create input{text-align:center}
+@media(max-width:600px){.goal-strip .goal-intro{flex-basis:100px;padding:7px 5px}.goal-strip .goal-intro .eyebrow{font-size:.4375rem;letter-spacing:.5px}.goal-strip .goal-intro a{font-size:.5625rem}}
+
+/* Neutral end panels keep the goal cards visually primary. */
+body[data-theme] .goal-strip .goal-intro,body[data-theme] .goal-strip .goal-actions{background:var(--surface,#fff);border-color:transparent;border-radius:0;box-shadow:none}
+body[data-theme] .goal-strip .goal-intro{border-right:1px solid var(--border,#cbd9e4);padding-right:12px}
+body[data-theme] .goal-strip .goal-actions{border-left:1px solid var(--border,#cbd9e4);padding-left:12px}
+body[data-theme="trello"] .goal-strip .goal-intro,body[data-theme="trello"] .goal-strip .goal-actions{background:transparent;border-color:#ffffff35}
+
+/* Direct column ordering and naming. */
+.column-head[draggable="true"]{cursor:grab}
+.column-head .column-grip{margin:0;padding:0 3px;font-size:1rem;line-height:1;flex:0 0 auto;cursor:grab;touch-action:none;opacity:.55}
+.column-head .column-grip:hover{opacity:1}
+.column-head .column-name,.column-head span.column-name{display:block;min-width:0;flex:1;margin:0;padding:3px 2px;text-align:left;font:inherit;font-weight:600;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.column-head button.column-name{cursor:text;border-radius:3px}
+.column-head button.column-name:hover{background:var(--tint,#dce5ee)}
+.column-head .column-name-input{min-width:0;width:0;flex:1;margin:0;padding:3px 4px;font:inherit;font-weight:600;line-height:1.4;border:1px solid var(--accent,#1877f2);border-radius:3px;background:var(--surface,#fff);color:var(--text,#294962);outline:0}
+.column-moving{opacity:.6;outline:2px dashed var(--accent,#1877f2);outline-offset:-2px}
+.column-head .count{flex-shrink:0}
+
+/* Goal strip font experiment: installed Office UI fonts. */
+.goal-strip{font-family:inherit}
+.goal-strip :is(button,input,a,.eyebrow){font-family:inherit}
+
+/* Larger goal-strip type with the selected Office font family. */
+.goal-strip .goal-card-top{font-size:.6875rem;font-weight:600;line-height:1.2rem;letter-spacing:0}
+.goal-strip .goal-progress,.goal-strip .goal-progress .item-age{font-size:.5625rem;line-height:.8rem;letter-spacing:0}
+.goal-strip .goal-intro .eyebrow{font-size:.5625rem;font-weight:700;letter-spacing:.3px}
+.goal-strip .goal-intro a,.goal-strip .goal-actions #manageBoardGoals,.goal-strip .goal-actions .goal-create input{font-size:.6875rem;letter-spacing:0}
+@media(max-width:600px){.goal-strip .goal-intro .eyebrow{font-size:.5rem;letter-spacing:0}.goal-strip .goal-intro a{font-size:.625rem}}
+
+/* Balanced hierarchy for the board goal strip. */
+.goal-strip .goal-card-top{font-size:.625rem;line-height:1.1rem}
+.goal-strip .goal-progress,.goal-strip .goal-progress .item-age{font-size:.5rem;line-height:.75rem}
+.goal-strip .goal-intro .eyebrow{font-size:.625rem;font-weight:700;letter-spacing:.2px}
+.goal-strip .goal-intro a{font-size:.5625rem;font-weight:500;text-decoration:underline;text-underline-offset:3px}
+body[data-theme] .goal-strip .goal-intro a{color:var(--accent,#e5f3ff)}
+.goal-strip .goal-intro a:hover{text-decoration-thickness:2px}
+.goal-strip .goal-actions #manageBoardGoals,.goal-strip .goal-actions .goal-create input{font-size:.625rem}
+@media(max-width:600px){.goal-strip .goal-intro .eyebrow{font-size:.5625rem}.goal-strip .goal-intro a{font-size:.5rem}}
+
+body[data-theme]:not([data-theme="linear"]):not([data-theme="trello"]) .goal-strip .goal-intro a{color:var(--accent)}
+
+/* Give the compact link a full text line so descenders stay visible. */
+.goal-strip .goal-actions #manageBoardGoals{flex:0 0 auto;height:auto;min-height:1rem;line-height:1.25;padding:0 2px 2px;position:relative;top:-2px;overflow:visible}
+
+/* Roomier goal creation field beneath the link. */
+.goal-strip .goal-actions{height:calc(var(--goal-height) + 16px)}
+.goal-strip .goal-actions .goal-create{min-height:2rem}
+.goal-strip .goal-actions .goal-create input{padding:0 11px}
+.goal-strip .goal-actions .goal-create button{padding:0 11px}
+
+/* Open end sections; goal cards use their original theme borders. */
+body[data-theme] .goal-strip .goal-intro{border-right:0}
+body[data-theme] .goal-strip .goal-actions{border-left:0}
+
+body[data-theme]:not([data-theme="linear"]):not([data-theme="trello"]) .goal-strip .goal-intro a,body[data-theme] .goal-strip .goal-intro a,body[data-theme] .goal-strip .goal-actions #manageBoardGoals{color:var(--goal-link,var(--accent));text-decoration:underline;text-underline-offset:3px}
+body[data-theme] .goal-strip .goal-intro a:hover,body[data-theme] .goal-strip .goal-actions #manageBoardGoals:hover{text-decoration-thickness:2px}
+body[data-theme]:not([data-theme="linear"]):not([data-theme="trello"]) .goal-strip .goal-actions #manageBoardGoals{color:var(--goal-link,var(--accent))}
+
+/* Goal creation joins the top action row, leaving the strip for goals. */
+.page-heading{gap:12px;flex-wrap:wrap}
+.page-heading>div:first-child{margin-right:auto}
+.heading-goal-actions{display:flex;align-items:center;gap:12px;min-width:0}
+.heading-goal-actions #manageBoardGoals{color:var(--goal-link,var(--accent,#e5f3ff));background:none;border:0;padding:5px 0;font-size:.6875rem;font-weight:600;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.heading-goal-actions .goal-create{flex:0 1 240px;width:240px;height:36px;min-width:0;background:var(--canvas,#ffffff16);border:1px dashed var(--border,#83b3d7);border-radius:6px}
+.heading-goal-actions .goal-create input{flex:1;width:100%;height:100%;min-width:0;margin:0;padding:0 12px;color:var(--text,#e5f3ff);font-size:.6875rem}
+.heading-goal-actions .goal-create button{height:100%;padding:0 12px;color:var(--goal-link,var(--accent,#e5f3ff))}
+body[data-theme] #allGoals{color:var(--goal-link,var(--accent,#e5f3ff));text-decoration:underline}
+@media(max-width:700px){.heading-goal-actions{order:3;flex-basis:100%;justify-content:flex-end}.heading-goal-actions .goal-create{flex:1;max-width:320px;width:auto}.page-heading>div:first-child{flex:1}}
+
+body[data-theme] .heading-goal-actions .goal-create{background:var(--surface,#fff);border:1px solid var(--border,#aac3d6)}
+
+body[data-theme] .heading-goal-actions .goal-create button{background:var(--accent,#315743);color:#fff;border-radius:0 5px 5px 0;align-self:stretch}
+body[data-theme="linear"] .heading-goal-actions .goal-create button{background:#8175e8;color:#fff}
+body[data-theme="trello"] .heading-goal-actions .goal-create button{background:#e0f0fc;color:#1b6091}
+
+.heading-goal-actions .goal-create{flex-basis:300px;width:300px}
+body[data-theme] .heading-goal-actions .goal-create button{background:var(--panel,#ebedf0);color:var(--text,#344b60);border-left:1px solid var(--border,#aac3d6)}
+@media(max-width:700px){.heading-goal-actions .goal-create{flex:1;width:auto;max-width:none}}
+
+/* Top goal controls shrink safely on phones and at larger font settings. */
+.heading-goal-actions{max-width:100%}
+.heading-goal-actions .goal-create{max-width:100%;min-height:2.25rem;height:auto}
+.heading-goal-actions .goal-create input{min-width:0;min-height:2.25rem}
+.heading-goal-actions .goal-create button{flex-shrink:0;height:auto}
+@media(max-width:700px){.heading-goal-actions{width:100%;gap:10px}.heading-goal-actions #manageBoardGoals{flex-shrink:0}.heading-goal-actions .goal-create{width:0;flex:1 1 0}}
+@media(max-width:380px){.heading-goal-actions{gap:8px}.heading-goal-actions #manageBoardGoals{font-size:.625rem}.heading-goal-actions .goal-create input{padding:0 8px}.heading-goal-actions .goal-create button{padding:0 9px}}
