@@ -1,0 +1,14 @@
+const fs=require('fs'),path=require('path'),vm=require('vm'),assert=require('assert/strict');
+const state={user:{id:'u'},boards:[{id:'a',name:'Personal',role:'owner'},{id:'b',name:'Projects',role:'editor'},{id:'c',name:'Read only',role:'viewer'}],goals:[{id:'health',name:'Health',owner:'u',boards:['a','b']},{id:'work',name:'Work',owner:'u',boards:['b']},{id:'private',name:'Private',owner:'u',boards:[]}],tasks:[{id:'1',title:'Walk',board:'a',goal:'health'},{id:'2',title:'Write',board:'b',goal:'work'},{id:'3',title:'Research',board:'b',goal:'health'},{id:'4',title:'Errand',board:'a',goal:''},{id:'5',title:'Viewer task',board:'c',goal:'work'}]};
+const context=vm.createContext({state,goalBoards:g=>g.boards||[],canEdit:id=>['owner','editor'].includes(state.boards.find(b=>b.id===id)?.role),ownGoal:g=>g.owner===state.user.id,boardInfo:id=>state.boards.find(b=>b.id===id)});vm.runInContext(fs.readFileSync(path.join(__dirname,'../notes.js'),'utf8'),context);function choose(selection,changed=''){return JSON.parse(vm.runInContext(`JSON.stringify(noteConnectionChoices(${JSON.stringify(selection)},${JSON.stringify(changed)}))`,context))}
+let r=choose({goal:['health'],board:[],task:[]},'goal');assert.deepEqual(r.options.board.map(x=>x.id),['a','b']);assert.deepEqual(r.options.task.map(x=>x.id),['1','3']);
+r=choose({goal:[],board:['b'],task:[]},'board');assert.deepEqual(r.options.goal.map(x=>x.id),['health','work']);assert.deepEqual(r.options.task.map(x=>x.id),['2','3']);
+r=choose({goal:[],board:[],task:['2']},'task');assert.deepEqual(r.selected,{goal:['work'],board:['b'],task:['2']});
+r=choose({goal:[],board:[],task:['4']},'task');assert.deepEqual(r.selected,{goal:[],board:['a'],task:['4']});
+r=choose({goal:['private'],board:['b'],task:['2']},'goal');assert.deepEqual(r.selected,{goal:['private'],board:[],task:[]});assert.equal(r.options.board.length,0);assert.equal(r.options.task.length,0);
+r=choose({goal:['work'],board:['a'],task:['2']},'board');assert.deepEqual(r.selected,{goal:[],board:['a'],task:[]});
+r=choose({goal:[],board:[],task:['1','2']},'task');assert.deepEqual(r.selected.board,['a','b']);assert.deepEqual(r.selected.goal,['health','work']);assert(!r.options.task.some(x=>x.id==='5'));
+r=choose({goal:[],board:[],task:[]});assert.equal(r.options.goal.length,3);assert.equal(r.options.board.length,2);assert.equal(r.options.task.length,4);
+// Existing independent selections remain intact on open; filtering never silently changes saved sharing.
+r=choose({goal:['private'],board:['b'],task:['2']});assert.deepEqual(r.selected,{goal:['private'],board:['b'],task:['2']});
+console.log('PASS: goal/board/task cascading filters, automatic task parents, multi-select unions, unlinked tasks, private goals, permission exclusions, cleared filters, and existing-link preservation.');

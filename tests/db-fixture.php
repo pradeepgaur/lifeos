@@ -9,6 +9,8 @@ elseif($action==='downgrade'){$pdo->exec('USE `'.$name.'`');$pdo->exec('DROP TAB
 elseif($action==='drop-backgrounds'){$pdo->exec('USE `'.$name.'`');$pdo->exec('DROP TABLE lifeos_backgrounds');}
 elseif($action==='age-logins'){$pdo->exec('USE `'.$name.'`');$pdo->exec('UPDATE lifeos_logins SET last_seen=DATE_SUB(UTC_TIMESTAMP(),INTERVAL 4 DAY),expires_at=DATE_ADD(UTC_TIMESTAMP(),INTERVAL 3 DAY)');}
 elseif($action==='task-times-downgrade'){$pdo->exec('USE `'.$name.'`');$pdo->exec('ALTER TABLE lifeos_tasks DROP start_time, DROP end_time');$pdo->exec('UPDATE lifeos_meta SET schema_version=7');}
+elseif($action==='notes-downgrade'){$pdo->exec('USE `'.$name.'`');foreach(array('note_boards','note_tasks','note_goals','note_prefs','note_files','notes') as $table)$pdo->exec('DROP TABLE lifeos_'.$table);$pdo->exec('UPDATE lifeos_meta SET schema_version=8');}
+elseif($action==='legacy-note-files'){$pdo->exec('USE `'.$name.'`');$pdo->exec('ALTER TABLE lifeos_note_files CHANGE bytes size INT NOT NULL, CHANGE data content MEDIUMBLOB NOT NULL');$pdo->exec('UPDATE lifeos_meta SET schema_version=9');}
 elseif($action==='legacy-workspace'){
     $pdo->exec('USE `'.$name.'`');
     $board=$pdo->query('SELECT MIN(id) FROM lifeos_boards')->fetchColumn();$owner=$pdo->query('SELECT owner_id FROM lifeos_boards WHERE id='.$board)->fetchColumn();

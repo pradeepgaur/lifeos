@@ -32,17 +32,22 @@ function ensure_schema($pdo) {
     // Upgrade before any application transaction. DDL is deliberately outside transactions.
     try{$version=(int)$pdo->query('SELECT schema_version FROM lifeos_meta WHERE id=1')->fetchColumn();}
     catch(PDOException $e){if($e->getCode()!=='42S22')throw $e;$pdo->exec('ALTER TABLE lifeos_meta ADD schema_version INT NOT NULL DEFAULT 1');$version=1;}
-    if($version>=8)return;
+    if($version>=10)return;
     $config=require config_path();$name='lifeos-migrate-'.substr(hash('sha256',$config['database']),0,32);$stmt=$pdo->prepare('SELECT GET_LOCK(?,10)');$stmt->execute(array($name));if(!$stmt->fetchColumn())throw new RuntimeException('Schema update busy. Retry shortly.');
     try{
-        $version=(int)$pdo->query('SELECT schema_version FROM lifeos_meta WHERE id=1')->fetchColumn();if($version>=8)return;
+        $version=(int)$pdo->query('SELECT schema_version FROM lifeos_meta WHERE id=1')->fetchColumn();if($version>=10)return;
         $schema=require __DIR__.'/schema.php';foreach(array('schedule','habit_checks','backgrounds','logins') as $table)$pdo->exec(str_replace('CREATE TABLE ','CREATE TABLE IF NOT EXISTS ',$schema[$table]));
         foreach(array('users','boards') as $table){try{$pdo->exec('ALTER TABLE lifeos_'.$table.' ADD sync_revision BIGINT NOT NULL DEFAULT 1');}catch(PDOException $e){if($e->getCode()!=='42S21')throw $e;}}
         try{$pdo->exec('ALTER TABLE lifeos_users ADD font_scale SMALLINT NOT NULL DEFAULT 112');}catch(PDOException $e){if($e->getCode()!=='42S21')throw $e;}
         require_once __DIR__.'/workspace-migration.php';
         if($version<7)migrate_workspace($pdo,$schema);
         foreach(array('start_time','end_time') as $field){try{$pdo->exec('ALTER TABLE lifeos_tasks ADD '.$field.' CHAR(5) NULL');}catch(PDOException $e){if($e->getCode()!=='42S21')throw $e;}}
-        $pdo->exec('UPDATE lifeos_meta SET schema_version=8 WHERE id=1');
+        foreach(array('notes','note_prefs','note_files','note_boards','note_tasks','note_goals') as $table)$pdo->exec(str_replace('CREATE TABLE ','CREATE TABLE IF NOT EXISTS ',$schema[$table]));
+        // Repair attachment columns from the first Notes rollout, keeping every file.
+        $fileColumns=$pdo->query('SHOW COLUMNS FROM lifeos_note_files')->fetchAll(PDO::FETCH_COLUMN);
+        if(!in_array('bytes',$fileColumns,true)&&in_array('size',$fileColumns,true))$pdo->exec('ALTER TABLE lifeos_note_files CHANGE size bytes INT NOT NULL');
+        if(!in_array('data',$fileColumns,true)&&in_array('content',$fileColumns,true))$pdo->exec('ALTER TABLE lifeos_note_files CHANGE content data MEDIUMBLOB NOT NULL');
+        $pdo->exec('UPDATE lifeos_meta SET schema_version=10 WHERE id=1');
     }
     finally{$stmt=$pdo->prepare('SELECT RELEASE_LOCK(?)');$stmt->execute(array($name));}
 }

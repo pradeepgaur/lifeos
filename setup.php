@@ -6,6 +6,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
     try{
         csrf_check($_POST['csrf'] ?? '');
         if(PHP_VERSION_ID<70000||!extension_loaded('pdo_mysql'))fail('PHP 7.0+ and PDO MySQL are required.');
+        if(!extension_loaded('dom')||!extension_loaded('fileinfo'))fail('Enable PHP DOM and Fileinfo in your hosting PHP settings for rich-text notes and attachments.');
         $host=text_value($_POST,'host',150);if(!preg_match('/^[a-zA-Z0-9.:-]+$/',$host))fail('Invalid database host.');
         $database=text_value($_POST,'database',100);if(!preg_match('/^[a-zA-Z0-9_$-]+$/',$database))fail('Use the database name supplied by your host.');
         $port=(int)($_POST['port'] ?? 3306);if($port<1||$port>65535)fail('Invalid MySQL port.');

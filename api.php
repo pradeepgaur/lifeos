@@ -1,5 +1,6 @@
 <?php
 require __DIR__.'/private/bootstrap.php';
+require_once __DIR__.'/private/notes.php';
 try {
     if(!installed()) out(array('error'=>'Setup is required.','setup'=>true),503);
     $method=$_SERVER['REQUEST_METHOD'];
@@ -71,7 +72,7 @@ try {
         foreach(rows('SELECT DISTINCT g.* FROM lifeos_goals g LEFT JOIN lifeos_board_goals bg ON bg.goal_id=g.id LEFT JOIN lifeos_members m ON m.board_id=bg.board_id AND m.user_id=? WHERE g.owner_id=? OR m.user_id IS NOT NULL ORDER BY g.id',array($uid,$uid)) as $g){$links=array();foreach($goalLinks as $link)if($link['goal_id']==$g['id'])$links[]=(string)$link['board_id'];$goals[]=array('id'=>(string)$g['id'],'owner'=>(string)$g['owner_id'],'boards'=>$links,'name'=>$g['name'],'description'=>$g['description'],'priority'=>$g['priority'],'icon'=>'◎','version'=>(int)$g['version'],'createdAt'=>utc_iso($g['created_at']),'achievedAt'=>utc_iso($g['achieved_at']));}
             foreach(rows('SELECT * FROM lifeos_schedule WHERE owner_id=? ORDER BY start_time,id',array($uid)) as $entry)$schedule[]=array('id'=>(string)$entry['id'],'board'=>'','owner'=>(string)$entry['owner_id'],'title'=>$entry['title'],'description'=>$entry['description'],'days'=>array_map('intval',explode(',',$entry['days'])),'startTime'=>$entry['start_time'],'endTime'=>$entry['end_time'],'startDate'=>$entry['start_date'],'endDate'=>$entry['end_date']?:'','trackHabit'=>(bool)$entry['track_habit'],'goal'=>$entry['goal_id']?(string)$entry['goal_id']:'','color'=>$entry['color'],'version'=>(int)$entry['version'],'createdAt'=>utc_iso($entry['created_at']));
         $habitChecks=rows('SELECT c.schedule_id AS schedule,c.day FROM lifeos_habit_checks c JOIN lifeos_schedule s ON s.id=c.schedule_id WHERE c.user_id=? AND s.owner_id=? ORDER BY c.day',array($uid,$uid));foreach($habitChecks as &$check)$check['schedule']=(string)$check['schedule'];unset($check);
-        db()->commit();out(array('revision'=>$rev,'user'=>public_user($u),'boards'=>$boards,'columns'=>(object)$columns,'goals'=>$goals,'tasks'=>$tasks,'members'=>$members,'invites'=>$invites,'schedule'=>$schedule,'habitChecks'=>$habitChecks));
+        db()->commit();out(array('revision'=>$rev,'user'=>public_user($u),'boards'=>$boards,'columns'=>(object)$columns,'goals'=>$goals,'tasks'=>$tasks,'members'=>$members,'invites'=>$invites,'schedule'=>$schedule,'habitChecks'=>$habitChecks,'notes'=>note_snapshot($uid)));
     }
     db()->beginTransaction();$result=array();
     if($action==='prototype_import') {require __DIR__.'/private/import.php';$bid=import_prototype($d['data'] ?? null,$uid);$result['board']=$bid;}
