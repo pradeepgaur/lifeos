@@ -1,0 +1,5 @@
+DirectoryIndex lavender.php
+Options -Indexes
+<FilesMatch "^(page\.php|README\.md|.*\.(jsonl|json|log|bak))$">
+  Require all denied
+</FilesMatch>
