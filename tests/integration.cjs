@@ -43,6 +43,7 @@ const password='LifeOS-test-pass-2026';
  await owner.post('task_update',{...t,startTime:'09:00',endTime:'10:30',version:(await owner.get('state')).tasks.find(x=>x.id===task).version});
  s=await owner.get('state');assert.equal(s.tasks.find(x=>x.id===task).startTime,'09:00');assert.equal(s.tasks.find(x=>x.id===task).endTime,'10:30');
  for(const times of [{startTime:'09:00'},{startTime:'11:00',endTime:'10:00'},{startTime:'25:00',endTime:'26:00'},{startTime:'09:00',endTime:'10:00',due:''}])await owner.post('task_create',{board:bid,status:'todo',title:'Invalid timed task',due:'2026-11-20',...times},400);
+ await require('./task-order.cjs')({owner,bid,unrelatedTask:task,fixture});
  const other=(await owner.post('board_create',{name:'Second board'})).id;
  await owner.post('task_create',{board:other,status:'todo',title:'Wrong goal',goal},400);
  await owner.post('board_goals',{board:other,goals:[goal]});

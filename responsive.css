@@ -163,3 +163,9 @@ body[data-theme] .heading-goal-actions .goal-create button{background:var(--pane
 .heading-goal-actions .goal-create button{flex-shrink:0;height:auto}
 @media(max-width:700px){.heading-goal-actions{width:100%;gap:10px}.heading-goal-actions #manageBoardGoals{flex-shrink:0}.heading-goal-actions .goal-create{width:0;flex:1 1 0}}
 @media(max-width:380px){.heading-goal-actions{gap:8px}.heading-goal-actions #manageBoardGoals{font-size:.625rem}.heading-goal-actions .goal-create input{padding:0 8px}.heading-goal-actions .goal-create button{padding:0 9px}}
+
+.column-head .column-delete-icon{display:inline-flex;align-items:center;justify-content:center;margin:0;padding:4px;min-width:26px;min-height:26px;flex:0 0 auto;color:var(--secondary,#617183);border-radius:4px;cursor:pointer}.column-head .column-delete-icon:hover{color:#b52f42;background:#b52f4214}#columnDeleteDialog{max-width:460px}#columnDeleteDialog h2{font-size:1.15rem;line-height:1.5;overflow-wrap:anywhere}
+
+.card-moving{opacity:.5}.card.card-drop-before{box-shadow:0 -3px 0 var(--accent,#1877f2)}.card.card-drop-after{box-shadow:0 3px 0 var(--accent,#1877f2)}
+
+.card.card-moving{opacity:.45}.card.card-drop-before{box-shadow:0 -4px 0 var(--accent,#1877f2)}.card.card-drop-after{box-shadow:0 4px 0 var(--accent,#1877f2)}

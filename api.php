@@ -1,6 +1,7 @@
 <?php
 require __DIR__.'/private/bootstrap.php';
 require_once __DIR__.'/private/notes.php';
+require __DIR__.'/private/task-order.php';
 try {
     if(!installed()) out(array('error'=>'Setup is required.','setup'=>true),503);
     $method=$_SERVER['REQUEST_METHOD'];
@@ -62,7 +63,7 @@ try {
 
             $allComments=rows('SELECT c.*,u.name FROM lifeos_comments c JOIN lifeos_tasks t ON t.id=c.task_id JOIN lifeos_users u ON u.id=c.user_id WHERE t.board_id IN ('.$in.') ORDER BY c.id');
             $commentMap=array();foreach($allComments as $c)$commentMap[$c['task_id']][]=array('id'=>(string)$c['id'],'author'=>$c['name'],'userId'=>(string)$c['user_id'],'text'=>$c['body'],'createdAt'=>utc_iso($c['created_at']));
-            foreach(rows('SELECT t.*,u.name AS assignee_name FROM lifeos_tasks t LEFT JOIN lifeos_users u ON u.id=t.assignee_id WHERE t.board_id IN ('.$in.') ORDER BY t.id') as $t)$tasks[]=array('id'=>(string)$t['id'],'board'=>(string)$t['board_id'],'status'=>$t['column_id'],'title'=>$t['title'],'description'=>$t['description'],'priority'=>$t['priority'],'area'=>$t['area'],'due'=>$t['due'] ?: '', 'startTime'=>$t['start_time']?:'','endTime'=>$t['end_time']?:'', 'goal'=>$t['goal_id']?(string)$t['goal_id']:'','assignee'=>$t['assignee_id']?(string)$t['assignee_id']:'','assigneeName'=>$t['assignee_name'] ?: 'Unassigned','checks'=>json_decode($t['checks'],true) ?: array(),'comments'=>isset($commentMap[$t['id']])?$commentMap[$t['id']]:array(),'version'=>(int)$t['version'],'createdAt'=>utc_iso($t['created_at']));
+            foreach(rows('SELECT t.*,u.name AS assignee_name FROM lifeos_tasks t LEFT JOIN lifeos_users u ON u.id=t.assignee_id WHERE t.board_id IN ('.$in.') ORDER BY t.board_id,t.column_id,t.sort_order,t.id') as $t)$tasks[]=array('id'=>(string)$t['id'],'board'=>(string)$t['board_id'],'status'=>$t['column_id'],'title'=>$t['title'],'description'=>$t['description'],'priority'=>$t['priority'],'area'=>$t['area'],'due'=>$t['due'] ?: '', 'startTime'=>$t['start_time']?:'','endTime'=>$t['end_time']?:'', 'goal'=>$t['goal_id']?(string)$t['goal_id']:'','assignee'=>$t['assignee_id']?(string)$t['assignee_id']:'','assigneeName'=>$t['assignee_name'] ?: 'Unassigned','checks'=>json_decode($t['checks'],true) ?: array(),'comments'=>isset($commentMap[$t['id']])?$commentMap[$t['id']]:array(),'version'=>(int)$t['version'],'createdAt'=>utc_iso($t['created_at']));
             $members=rows('SELECT m.board_id AS board,u.id,u.name,u.email,m.role FROM lifeos_members m JOIN lifeos_users u ON u.id=m.user_id WHERE m.board_id IN ('.$in.') ORDER BY u.name');foreach($members as &$m){$m['board']=(string)$m['board'];$m['id']=(string)$m['id'];}unset($m);
             $invites=rows('SELECT i.id,i.board_id AS board,i.email,i.role,i.expires_at FROM lifeos_invites i JOIN lifeos_boards b ON b.id=i.board_id WHERE b.owner_id=? AND i.expires_at>UTC_TIMESTAMP() ORDER BY i.id',array($uid));
 
@@ -96,7 +97,7 @@ try {
             if($action==='column_update')query('UPDATE lifeos_columns SET name=?,is_done=?,version=version+1 WHERE board_id=? AND id=?',array(text_value($d,'name',80),!empty($d['done'])?1:0,$bid,$id));
             elseif($action==='column_delete') {
                 $target=text_value($d,'moveTo',60);if($target===$id||!row('SELECT id FROM lifeos_columns WHERE board_id=? AND id=?',array($bid,$target)))fail('Select another column to receive its tasks.');
-                query('UPDATE lifeos_tasks SET column_id=?,version=version+1 WHERE board_id=? AND column_id=?',array($target,$bid,$id));query('DELETE FROM lifeos_columns WHERE board_id=? AND id=?',array($bid,$id));
+                task_append_column($bid,$id,$target);query('DELETE FROM lifeos_columns WHERE board_id=? AND id=?',array($bid,$id));
             }else fail('Unknown column action.');
         }
     }
@@ -135,7 +136,7 @@ try {
         elseif($action==='task_delete')query('DELETE FROM lifeos_tasks WHERE id=?',array($t['id']));
         else {
             $status=text_value($d,'status',60);if(!row('SELECT id FROM lifeos_columns WHERE board_id=? AND id=?',array($bid,$status)))fail('Column not found.',404);
-            if($action==='task_move')query('UPDATE lifeos_tasks SET column_id=?,version=version+1 WHERE id=?',array($status,$t['id']));
+            if($action==='task_move')task_reposition($t,$status,empty($d['before'])?null:id_value($d['before']));
             else {
                 $title=text_value($d,'title',250);$description=text_value($d,'description',20000,false);$area=text_value($d,'area',80,false);$priority=$d['priority'] ?? 'Medium';if(!in_array($priority,array('Low','Medium','High'),true))fail('Invalid priority.');
                 $due=$d['due'] ?? '';if($due!==''&&(!is_string($due)||!preg_match('/^\d{4}-\d{2}-\d{2}$/',$due)||!checkdate((int)substr($due,5,2),(int)substr($due,8,2),(int)substr($due,0,4))))fail('Invalid due date.');
@@ -144,9 +145,10 @@ try {
                 $goal=empty($d['goal'])?null:id_value($d['goal']);if($goal&&!row('SELECT goal_id FROM lifeos_board_goals WHERE goal_id=? AND board_id=?',array($goal,$bid)))fail('Attach this goal to the board first.');
                 $assignee=empty($d['assignee'])?null:id_value($d['assignee']);if($assignee&&!row('SELECT user_id FROM lifeos_members WHERE board_id=? AND user_id=?',array($bid,$assignee)))fail('Assignee must be a board member.');
                 $checks=$d['checks'] ?? array();if(!is_array($checks)||count($checks)>200)fail('Use up to 200 checklist items per task.');$clean=array();foreach($checks as $c){if(!is_array($c))fail('Invalid checklist.');$clean[]=array('text'=>text_value($c,'text',500),'done'=>!empty($c['done']));}
-                $args=array($status,$title,$description,$priority,$area,$due?:null,$start?:null,$end?:null,$goal,$assignee,json_encode($clean));
-                if($t){$args[]=$t['id'];query('UPDATE lifeos_tasks SET column_id=?,title=?,description=?,priority=?,area=?,due=?,start_time=?,end_time=?,goal_id=?,assignee_id=?,checks=?,version=version+1 WHERE id=?',$args);}
-                else{$args[]=$bid;query('INSERT INTO lifeos_tasks(column_id,title,description,priority,area,due,start_time,end_time,goal_id,assignee_id,checks,board_id,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,UTC_TIMESTAMP())',$args);$result['id']=(string)db()->lastInsertId();}
+                $position=$t&&$t['column_id']===$status?$t['sort_order']:task_next_position($bid,$status);
+                $args=array($status,$position,$title,$description,$priority,$area,$due?:null,$start?:null,$end?:null,$goal,$assignee,json_encode($clean));
+                if($t){$args[]=$t['id'];query('UPDATE lifeos_tasks SET column_id=?,sort_order=?,title=?,description=?,priority=?,area=?,due=?,start_time=?,end_time=?,goal_id=?,assignee_id=?,checks=?,version=version+1 WHERE id=?',$args);}
+                else{$args[]=$bid;query('INSERT INTO lifeos_tasks(column_id,sort_order,title,description,priority,area,due,start_time,end_time,goal_id,assignee_id,checks,board_id,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,UTC_TIMESTAMP())',$args);$result['id']=(string)db()->lastInsertId();}
             }
         }
     }
